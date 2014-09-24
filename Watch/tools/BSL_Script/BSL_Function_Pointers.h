@@ -1,0 +1,6 @@
+#ifndef BSL_FUNCTION_POINTERS_H
+#define BSL_FUNCTION_POINTERS_H
+
+
+
+#endif

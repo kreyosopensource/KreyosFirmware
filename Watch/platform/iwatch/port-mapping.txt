@@ -1,0 +1,9 @@
+Debug Serial port  UCA0
+
+MPU5060 I2C port   UCB1
+
+
+
+
+Switch 1-4     P2.0 - P2.3
+

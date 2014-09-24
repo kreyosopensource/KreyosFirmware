@@ -1,0 +1,28 @@
+#############################################################################
+#
+# unicode - Unicode block definitions for ASCII and other lanaguages
+# reference - http://blog.oasisfeng.com/2006/10/19/full-cjk-unicode-range/
+#
+# basic latin
+0x20, 0x7f
+
+#latin-1 extension
+0xA0, 0xff
+
+#German
+
+
+# Japanese
+0x3040, 0x309F
+0x30A0, 0x30FF
+0x31F0, 0x32FF
+0xFF00, 0xFFEF
+
+#korea
+0xAC00, 0xD7AF
+0x1100, 0x11FF
+
+#chinese
+0x4e00, 0x9FFF
+#0x6300, 0x64FF
+

@@ -1,0 +1,256 @@
+IARPATH = "C:\Program Files\IAR Systems\Embedded Workbench 6.4 Evaluation\430"
+WINE    =
+CC      = $(IARPATH)/bin/icc430.exe
+LINK    = $(IARPATH)/bin/xlink.exe
+LIB     = $(IARPATH)/bin/xlib.exe
+ECHO	= echo
+
+BUILDNUM = buildnum
+FWVERSION ="1.0.0.$$(cat $(BUILDNUM))"
+
+IGNORE_WARNINGS=Pa050
+
+CFLAGS  = --debug -D__MSP430F5438A__ -e --double=32 --dlib_config $(IARPATH)/LIB/DLIB/dl430xlfn.h  --core=430X --reduce_stack_usage --data_model=large -Ohs --multiplier=32 --multiplier_location=4C0 --hw_workaround=CPU40 --relaxed_fp --silent --diag_suppress $(IGNORE_WARNINGS) --no_wrap_diagnostics -DFWVERSION=\"$(FWVERSION)\"
+LDFLAGS = -z -xmsnio -I$(IARPATH)/LIB -f ./build/iwatch-lnk430F5438A.xcl -f $(IARPATH)/config/multiplier32_loc2.xcl -D_STACK_SIZE=900 -r $(IARPATH)/LIB/DLIB/dl430xlfn.r43 -D_DATA16_HEAP_SIZE=F10 -s __program_start -D_DATA20_HEAP_SIZE=E10
+
+LIBS = pedometer/sleepalgo.r43 pedometer/ti_pedometer.r43
+
+ALL_DEFINES = RELEASE_VERSION AUTOSTART_ENABLE=1 HAVE_BLE=1 AMX_ANSIONLY=1 BYTE_ORDER=LITTLE_ENDIAN PAWN_CELL_SIZE=16 HAVE_ALLOCA_H=0 PRODUCT_W001=1 AMX_NATIVETABLE=window_natives
+ALL_INCLUDEDIRS = \
+	. \
+	core \
+	core/lib \
+	cpu/msp430 \
+	ant \
+	platform/common \
+	platform/iwatch \
+	platform/common/btstack \
+	platform/iwatch/btstack \
+	btstack/src \
+  btstack/chipset-cc256x \
+	btstack/include \
+
+#######################################
+# source files
+CORE   = \
+    core/cfs/cfs-coffee.c \
+    core/sys/ctimer.c \
+    core/sys/etimer.c \
+    core/sys/energest.c \
+    core/sys/process.c \
+    core/sys/rtimer.c \
+    core/sys/stimer.c \
+    core/sys/timer.c \
+    core/lib/assert.c \
+    core/lib/list.c
+
+COMMON = \
+  platform/common/memlcd.c
+
+PLATFORM = \
+	platform/iwatch/backlight.c \
+	platform/iwatch/battery.c \
+	platform/iwatch/button.c \
+	platform/iwatch/clock.c \
+	platform/iwatch/flash.c \
+	platform/iwatch/i2c.c \
+	platform/iwatch/isr.c \
+	platform/iwatch/msp430.c \
+  platform/iwatch/contiki-exp5438-main.c \
+	platform/iwatch/rtc.c \
+  platform/iwatch/spiflash.c \
+  platform/iwatch/printf.c \
+  platform/iwatch/system.c \
+  platform/iwatch/progam.c \
+	platform/iwatch/rtimer-arch.c \
+	platform/iwatch/uart1-putchar.c \
+	platform/iwatch/watchdog.c \
+	platform/iwatch/Template_Driver.c
+
+ANT = \
+	ant/antinterface.c \
+	ant/cbsc_rx.c \
+	ant/hrm_rx.c \
+  ant/data.c \
+	platform/iwatch/ant/main_hrm.c \
+	platform/iwatch/ant/serial.c \
+	platform/iwatch/ant/ant_timer.c
+
+GRLIB0 = \
+  circle.c \
+  charmap.c \
+  context.c \
+  image.c \
+  line.c \
+  rectangle.c \
+  triagle.c \
+  string.c
+
+GRLIB_FONTS = \
+  fontgothic14.c \
+  fontgothic18.c \
+  fontgothic18b.c \
+  fontgothic24b.c \
+  fontgothic28.c \
+  fontgothic28b.c \
+  fontnimbus30.c \
+  fontnimbus38.c \
+  fontnimbus46.c \
+  fontnimbus52.c \
+  fontnimbus34.c \
+  fontnimbus40.c \
+  fontnimbus50.c \
+  fontnimbus91.c \
+  fonticon16.c \
+  fonticon32.c \
+  fonticon48.c \
+  fontunicode.c \
+  logoimg.c
+
+GRLIB = $(addprefix grlib/, $(GRLIB0)) $(addprefix grlib/fonts/, $(GRLIB_FONTS))
+
+BTSTACK0 = \
+	codec.c \
+	hal.c \
+	hal_compat.c \
+	hal_uart_dma.c \
+  bt_init.c
+
+BTSTACK1 = \
+	ble/att.c \
+  ble/att_client.c \
+  ble/att_server.c \
+  ble/central_device_db_memory.c \
+  ble/sm.c \
+	chipset-cc256x/bluetooth_init_cc2564_2.10.c \
+	chipset-cc256x/bt_control_cc256x.c \
+	src/avctp.c \
+	src/avrcp.c \
+	src/btstack_memory.c \
+	src/hci.c \
+	src/hci_cmds.c \
+	src/hci_dump.c \
+	src/hci_transport_h4_ehcill_dma.c \
+	src/hfp.c \
+	src/l2cap.c \
+	src/l2cap_signaling.c \
+	src/linked_list.c \
+	src/memory_pool.c \
+	src/remote_device_db_memory.c \
+	src/rfcomm.c \
+	src/sdp.c \
+	src/sdp_util.c \
+	src/utils.c
+
+BTSTACK3 = \
+  bluetooth.c \
+  ble_file_handler.c \
+  ble_handler.c \
+  sdp_client.c \
+  spp.c \
+  stlv.c \
+  stlv_client.c \
+  stlv_handler.c \
+  stlv_server.c \
+  stlv_transport.c \
+  run_loop.c \
+
+BTSRCS = $(addprefix btstack/, $(BTSTACK1))
+
+BTSTACK = $(addprefix platform/iwatch/btstack/, $(BTSTACK0))  $(addprefix platform/common/btstack/, $(BTSTACK3))
+
+AMX0 = amx.c amxwindow.c amxstring.c amxcons.c
+AMX = $(addprefix pawnscript/, $(AMX0))
+
+MPL0 = mpu6050.c
+MPL = $(addprefix platform/iwatch/mpl/, $(MPL0))
+
+WATCH = \
+    watch/analog-watch.c \
+    watch/configtime.c \
+    watch/countdown.c \
+    watch/controller.c \
+    watch/controls.c \
+    watch/charging.c \
+    watch/digit-watch.c \
+    watch/stopwatch.c \
+    watch/names.c \
+    watch/menu.c \
+    gesture/gesture.c \
+    watch/cordic.c \
+    watch/calendar.c \
+    watch/stopwatch.c \
+    watch/sportswatch.c \
+    watch/sportwait.c \
+    watch/sportselect.c \
+    watch/sportsdata.c \
+    watch/phone.c \
+    watch/notification.c \
+    watch/worldclock.c \
+    watch/host.c \
+    watch/today.c \
+    watch/test.c \
+    watch/status.c \
+    watch/selftest.c \
+    watch/btconfig.c \
+    watch/upgrade.c \
+    watch/reset.c \
+    watch/sleep.c \
+    watch/test.c \
+    watch/siri.c \
+    watch/welcome.c \
+    watch/window.c
+
+SERVICES= \
+  gesture/gesture.c \
+  pedometer/pedometer_dist.c
+#  pedometer/pedometer.c \
+#  pedometer/pedometer_msp430.c \
+
+OBJDIR = objs.msp430
+SRCS = $(CORE) $(WATCH) $(PLATFORM) $(ANT) $(BTSTACK) $(GRLIB) $(MPL) $(SERVICES) $(AMX) $(COMMON)
+OBJS0 = $(SRCS:.c=.o)
+OBJS = $(addprefix $(OBJDIR)/, $(OBJS0))
+
+BTOBJS0 = $(BTSRCS:.c=.o)
+BTOBJS = $(addprefix $(OBJDIR)/, $(BTOBJS0))
+
+ifeq ($(WINE), )
+DEPFILES = $(OBJS:.o=.d)
+endif
+
+#####################
+# rules to build the object files
+$(OBJDIR)/%.o: %.c
+	@$(ECHO) "Compiling $<"
+	@test -d $(OBJDIR) || mkdir -pm 775 $(OBJDIR)
+	@test -d $(@D) || mkdir -pm 775 $(@D)
+	@-$(RM) $@
+	@$(WINE) $(CC) $< $(CFLAGS) $(ALL_DEFINES:%=-D%) $(ALL_INCLUDEDIRS:%=-I%) --dependencies=m + -o $@
+
+# create firmware image from common objects and example source file
+
+all: buildnum $(OBJS) $(OBJDIR)/watch.txt
+
+$(OBJDIR)/watch.txt: ${OBJS} btstack.r43
+	@echo "Link $@"
+	$(WINE) ${LINK} $^ $(LIBS) ${LDFLAGS} -Omsp430_txt=$@ -l $(OBJDIR)/watch.map
+
+buildnum: $(OBJS)
+	@echo "Build Number: $$(cat buildnum)"
+ifeq ($(OFFICIAL), 1)
+	@echo $$(($$(cat buildnum) + 1)) > buildnum
+	git commit buildnum -m "pump version to $$(cat buildnum)" 
+	git push
+endif
+
+ifeq ($(WINE), )
+ifneq ($(MAKECMDGOALS), clean)
+-include $(DEPFILES)
+endif
+endif
+
+.SILENT:
+.PHONY:	clean
+clean:
+	rm -Rf $(OBJDIR)/
